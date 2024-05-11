@@ -35,6 +35,7 @@ class Camera:
         time.sleep(1)
         self.job = self.camera.switch_mode_and_capture_file(self.still_config, self.file_output, wait=False)
         self.metadata = self.camera.wait(self.job)
+        return self.file_output
 
 
 class StreamingOutput(io.BufferedIOBase):
