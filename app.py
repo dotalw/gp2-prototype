@@ -1,7 +1,7 @@
 import os
 
 from dotenv import dotenv_values
-from flask import Flask, render_template, Response, send_from_directory
+from flask import Flask, render_template, Response, send_from_directory, redirect, url_for
 from flask_restful import Api, Resource
 from flask_vite import Vite
 from picamera2.encoders import H264Encoder
@@ -43,9 +43,8 @@ def index():
 
 @app.route('/scan')
 def scan():
-    camera.video_snap()
-    # print(fo)
-    # return render_template('scan.j2', snippet=fo)
+    fp = camera.video_snap()
+    return redirect(url_for('search', filename=fp))
 
 
 @app.route('/files')
@@ -59,7 +58,7 @@ def files():
 def search(filename):
     pic_dir = '{0}/pictures/'.format(app.static_folder)
     if filename in os.listdir(pic_dir):
-        return ocr.ocr_space_file(pic_dir + filename)
+        return ocr.space_file(pic_dir + filename)
     else:
         return "File not found", 404
 

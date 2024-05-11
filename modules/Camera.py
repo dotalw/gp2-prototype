@@ -36,11 +36,15 @@ class Camera:
 
     def video_snap(self):
         timestamp = datetime.now().isoformat("_", "seconds")
-        self.still_config = self.camera.create_still_configuration({"format": "YUV420"})
-        self.file_output = "/home/alw/pyc/gp2-2/static/pictures/snap_%s.jpg" % timestamp
-        time.sleep(1)
-        self.job = self.camera.switch_mode_and_capture_file(self.still_config, self.file_output, wait=False)
-        self.metadata = self.camera.wait(self.job)
+        req = self.camera.capture_request()
+        req.save("main", "static/pictures/snap_%s.jpg" % timestamp)
+        req.release()
+        return "snap_%s.jpg" % timestamp
+        # self.still_config = self.camera.create_still_configuration({"format": "YUV420"})
+        # self.file_output = "/home/alw/pyc/gp2-2/static/pictures/snap_%s.jpg" % timestamp
+        # time.sleep(1)
+        # self.job = self.camera.switch_mode_and_capture_file(self.still_config, self.file_output, wait=False)
+        # self.metadata = self.camera.wait(self.job)
         # return self.file_output
 
 
