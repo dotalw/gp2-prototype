@@ -12,7 +12,7 @@ from picamera2.outputs import FileOutput
 class Camera:
     def __init__(self, encoders, output):
         self.camera = Picamera2()
-        self.camera.configure(self.camera.create_video_configuration(main={"size": (800, 600)}))
+        self.camera.configure(self.camera.create_video_configuration(main={"size": (1536, 864)}))
         self.still_config = self.camera.create_still_configuration()
         self.encoder = MJPEGEncoder(10000000)
         self.streamOut = StreamingOutput()
