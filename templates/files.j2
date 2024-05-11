@@ -1,0 +1,47 @@
+{% extends 'layout.j2' %}
+
+{% block content %}
+    <div class="card w-full bg-base-100 shadow-xl">
+        <div class="card-body">
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <!-- head -->
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Job</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for image in images %}
+                        <!-- row {{ loop.index }} -->
+                        <tr>
+                            <th>{{ loop.index }}</th>
+                            <td>{{ image }}</td>
+                            <td>
+                                <div class="avatar">
+                                    <div class="mask mask-squircle w-12 h-12">
+                                        <img src="{{ url_for('static', filename='pictures/' + image) }}"
+                                             alt="Avatar"/>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="join join-vertical lg:join-horizontal">
+                                    <a class="btn btn-accent btn-outline join-item" href="{{ '/scan/' + image }}">Scan</a>
+                                    <a class="btn btn-outline join-item">DEL</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-actions justify-center">
+                <a class="btn btn-wide btn-primary" href="{{ '/' }}">Back</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

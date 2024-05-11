@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 from threading import Condition
 
+from libcamera import controls
 from picamera2 import Picamera2
 from picamera2.encoders import MJPEGEncoder
 from picamera2.outputs import FileOutput
@@ -21,8 +22,13 @@ class Camera:
         self.camera.start_encoder(self.encoder)
         self.camera.start_recording(encoders, output)
 
+    def __del__(self):
+        self.camera.stop_encoder()
+        self.camera.stop_recording()
+
     def get_frame(self):
         self.camera.start()
+        self.camera.set_controls({"AfMode": controls.AfModeEnum.Continuous})
         with self.streamOut.condition:
             self.streamOut.condition.wait()
             self.frame = self.streamOut.frame
@@ -30,12 +36,12 @@ class Camera:
 
     def video_snap(self):
         timestamp = datetime.now().isoformat("_", "seconds")
-        self.still_config = self.camera.create_still_configuration()
+        self.still_config = self.camera.create_still_configuration({"format": "YUV420"})
         self.file_output = "/home/alw/pyc/gp2-2/static/pictures/snap_%s.jpg" % timestamp
         time.sleep(1)
         self.job = self.camera.switch_mode_and_capture_file(self.still_config, self.file_output, wait=False)
         self.metadata = self.camera.wait(self.job)
-        return self.file_output
+        # return self.file_output
 
 
 class StreamingOutput(io.BufferedIOBase):
