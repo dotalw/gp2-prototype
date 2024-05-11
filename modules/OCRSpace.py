@@ -1,4 +1,5 @@
 import os
+from pprint import pprint
 
 import requests
 from PIL import Image, ImageDraw, ImageFont
@@ -11,16 +12,16 @@ OPACITY = int(255 * TRANSPARENCY)
 
 def overlay_image(filename, data, pictures_dir, output_dir):
     img = Image.open(pictures_dir + filename)
-    img.convert('RGBA')
+    img = img.convert('RGBA')
 
     overlay = Image.new('RGBA', img.size, TINT_COLOR + (0,))
     draw = ImageDraw.Draw(overlay)
 
-    for pr in data['ParsedResults']['TextOverlay']:
-        for line in pr['Lines']:
+    for pr in data['ParsedResults']:
+        for line in pr['TextOverlay']['Lines']:
             for w in line['Words']:
                 x1 = (w['Left'], w['Top'])
-                x2 = (x1[0] + w['Width'].w['Top'] + w['Height'])
+                x2 = (x1[0] + w['Width'], x1[1] + w['Height'])
 
                 font_size = abs(x1[1] - x2[1])
                 font = ImageFont.truetype(UNICODE_FONT, int(font_size))
@@ -29,9 +30,10 @@ def overlay_image(filename, data, pictures_dir, output_dir):
 
                 text = w["WordText"]
                 draw.text(x1, text, fill=(255, 0, 0, 255), font=font)
+                pprint((x1, x2, text))
 
     img = Image.alpha_composite(img, overlay)
-    output_filename = os.path.join(filename, os.path.splitext(filename)[0] + '_overlay.png')
+    output_filename = os.path.splitext(filename) + '_overlay.png'
     img.save(output_dir + output_filename)
 
 
