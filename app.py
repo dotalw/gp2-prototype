@@ -1,14 +1,15 @@
+import json
 import os
 
 from dotenv import dotenv_values
-from flask import Flask, render_template, Response, send_from_directory, redirect, url_for
+from flask import Flask, render_template, Response, redirect, url_for
 from flask_restful import Api, Resource
 from flask_vite import Vite
 from picamera2.encoders import H264Encoder
 from picamera2.outputs import CircularOutput
 
 from modules.Camera import Camera
-from modules.OCRSpace import OCR
+from modules.OCRSpace import OCR, overlay_image
 
 config = dotenv_values(".env")
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
@@ -57,8 +58,18 @@ def files():
 @app.route('/scan/<filename>')
 def search(filename):
     pic_dir = '{0}/pictures/'.format(app.static_folder)
+    result_dir = '{0}/results/'.format(app.static_folder)
+    json_filepath = os.path.join(result_dir, os.path.splitext(filename)[0] + '.json')
+
     if filename in os.listdir(pic_dir):
-        return ocr.space_file(pic_dir + filename)
+        if not os.path.exists(json_filepath):
+            result = ocr.space_file(pic_dir + filename, overlay=True)
+            with open(json_filepath, 'w') as json_file:
+                json.dump(result, json_file)
+
+        with open(json_filepath, 'r') as json_file:
+            data = json.load(json_file)
+        return overlay_image(filename, data, pictures_dir=pic_dir, output_dir="{0}/overlays/".format(app.static_folder))
     else:
         return "File not found", 404
 
