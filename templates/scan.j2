@@ -1,14 +1,25 @@
 {% extends 'layout.j2' %}
 
 {% block content %}
-    <div class="card w-96 bg-base-100 shadow-xl">
-        <figure>
-            <img src="{{ snippet }}" />
-        </figure>
-        <div class="card-body">
-            <div class="card-actions justify-end">
-                <a class="btn btn-primary" href="{{ '/' }}">Back</a>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="card w-96 bg-base-100 shadow-xl">
+            <div class="card-body">
+                <p class="prose">{{ parsed_text }}</p>
+                <audio src="data:audio/mp3;base64,{{ tts_audio }}" controls autoplay></audio>
+                <div class="card-actions justify-center">
+                    <a class="btn btn-wide btn-primary" href="{{ '/' }}">Back</a>
+                </div>
             </div>
+        </div>
+        <div class="card w-96 bg-base-100 shadow-xl">
+            <figure>
+                <img src="{{ url_for('static', filename='overlays/' + overlay) }}"/>
+            </figure>
+        </div>
+        <div class="card w-96 bg-base-100 shadow-xl">
+            <figure>
+                <img src="{{ url_for('static', filename='pictures/' + img) }}"/>
+            </figure>
         </div>
     </div>
 {% endblock %}

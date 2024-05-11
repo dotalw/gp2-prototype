@@ -1,12 +1,11 @@
 import os
-from pprint import pprint
 
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
 UNICODE_FONT = "{0}/Arial Unicode.ttf".format(os.getcwd())
 TINT_COLOR = (255, 255, 0)
-TRANSPARENCY = .70
+TRANSPARENCY = .30
 OPACITY = int(255 * TRANSPARENCY)
 
 
@@ -16,8 +15,10 @@ def overlay_image(filename, data, pictures_dir, output_dir):
 
     overlay = Image.new('RGBA', img.size, TINT_COLOR + (0,))
     draw = ImageDraw.Draw(overlay)
+    pt = None
 
     for pr in data['ParsedResults']:
+        pt = pr['ParsedText']
         for line in pr['TextOverlay']['Lines']:
             for w in line['Words']:
                 x1 = (w['Left'], w['Top'])
@@ -28,13 +29,13 @@ def overlay_image(filename, data, pictures_dir, output_dir):
 
                 draw.rectangle((x1, x2), fill=TINT_COLOR + (OPACITY,))
 
-                text = w["WordText"]
+                text = w['WordText']
                 draw.text(x1, text, fill=(255, 0, 0, 255), font=font)
-                pprint((x1, x2, text))
 
     img = Image.alpha_composite(img, overlay)
-    output_filename = os.path.splitext(filename) + '_overlay.png'
+    output_filename = os.path.splitext(filename)[0] + "_overlay.png"
     img.save(output_dir + output_filename)
+    return pt, output_filename
 
 
 class OCR:

@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 
@@ -10,6 +11,7 @@ from picamera2.outputs import CircularOutput
 
 from modules.Camera import Camera
 from modules.OCRSpace import OCR, overlay_image
+from modules.tts import convert
 
 config = dotenv_values(".env")
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
@@ -69,7 +71,13 @@ def search(filename):
 
         with open(json_filepath, 'r') as json_file:
             data = json.load(json_file)
-        return overlay_image(filename, data, pictures_dir=pic_dir, output_dir="{0}/overlays/".format(app.static_folder))
+        overlay_filename = overlay_image(filename, data, pictures_dir=pic_dir,
+                                         output_dir="{0}/overlays/".format(app.static_folder))
+
+        pt = overlay_filename[0]
+        converted_b = convert(pt)
+        tts_audio = base64.b64encode(converted_b.getvalue()).decode('utf-8')
+        return render_template('scan.j2', img=filename, overlay=overlay_filename[1], tts_audio=tts_audio, parsed_text=pt)
     else:
         return "File not found", 404
 
