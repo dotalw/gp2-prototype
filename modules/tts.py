@@ -1,13 +1,15 @@
 from io import BytesIO
 
 from ftlangdetect import detect
-from gtts import gTTS
+from gtts import gTTS, lang
 
 
 def convert(text: str):
     b = BytesIO()
-    tts = gTTS(text=text, lang=detect_lang(text.replace('\n', ' '))['lang'], lang_check=False)
-    tts.write_to_fp(b)
+    detected_lang = detect(text=text, low_memory=False).get('lang', 'en')
+    if detected_lang not in lang.tts_langs():
+        detected_lang = 'en'
+    gTTS(text=text, lang=detected_lang, lang_check=False).write_to_fp(b)
     return b
 
 

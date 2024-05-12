@@ -1,5 +1,5 @@
 {% extends 'layout.j2' %}
-
+{% block is_flex %} {% endblock %}
 {% block content %}
     <div class="card w-full bg-base-100 shadow-xl">
         <div class="card-body">
@@ -30,7 +30,8 @@
                             </td>
                             <td>
                                 <div class="join join-vertical lg:join-horizontal">
-                                    <a class="btn btn-accent btn-outline join-item" href="{{ '/scan/' + image }}">Scan</a>
+                                    <a class="btn btn-accent btn-outline join-item"
+                                       href="{{ '/scan/' + image }}">Scan</a>
                                     <a class="btn btn-outline join-item">DEL</a>
                                 </div>
                             </td>
