@@ -61,7 +61,9 @@ def files():
 def search(filename):
     pic_dir = '{0}/pictures/'.format(app.static_folder)
     result_dir = '{0}/results/'.format(app.static_folder)
+    overlay_dir = "{0}/overlays/".format(app.static_folder)
     json_filepath = os.path.join(result_dir, os.path.splitext(filename)[0] + '.json')
+    overlay_filepath = os.path.join(overlay_dir, os.path.splitext(filename)[0] + '_overlay.png')
 
     if filename in os.listdir(pic_dir):
         if not os.path.exists(json_filepath):
@@ -71,13 +73,19 @@ def search(filename):
 
         with open(json_filepath, 'r') as json_file:
             data = json.load(json_file)
-        overlay_filename = overlay_image(filename, data, pictures_dir=pic_dir,
-                                         output_dir="{0}/overlays/".format(app.static_folder))
+
+        dov = not os.path.exists(overlay_filepath)
+        overlay_filename = overlay_image(filename, data, pictures_dir=pic_dir, output_dir=overlay_dir, draw_overlay=dov)
 
         pt = overlay_filename[0]
-        converted_b = convert(pt)
-        tts_audio = base64.b64encode(converted_b.getvalue()).decode('utf-8')
-        return render_template('scan.j2', img=filename, overlay=overlay_filename[1], tts_audio=tts_audio, parsed_text=pt)
+        try:
+            converted_b = convert(pt)
+            tts_audio = base64.b64encode(converted_b.getvalue()).decode('utf-8')
+        except:
+            tts_audio = None
+
+        return render_template('scan.j2', img=filename, overlay=overlay_filename[1], tts_audio=tts_audio,
+                               parsed_text=pt)
     else:
         return "File not found", 404
 

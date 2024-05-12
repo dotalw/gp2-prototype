@@ -9,7 +9,7 @@ TRANSPARENCY = .30
 OPACITY = int(255 * TRANSPARENCY)
 
 
-def overlay_image(filename, data, pictures_dir, output_dir):
+def overlay_image(filename, data, pictures_dir, output_dir, draw_overlay=True):
     img = Image.open(pictures_dir + filename)
     img = img.convert('RGBA')
 
@@ -19,6 +19,8 @@ def overlay_image(filename, data, pictures_dir, output_dir):
 
     for pr in data['ParsedResults']:
         pt = pr['ParsedText']
+        if not draw_overlay:
+            break
         for line in pr['TextOverlay']['Lines']:
             for w in line['Words']:
                 x1 = (w['Left'], w['Top'])
@@ -32,9 +34,10 @@ def overlay_image(filename, data, pictures_dir, output_dir):
                 text = w['WordText']
                 draw.text(x1, text, fill=(255, 0, 0, 255), font=font)
 
-    img = Image.alpha_composite(img, overlay)
     output_filename = os.path.splitext(filename)[0] + "_overlay.png"
-    img.save(output_dir + output_filename)
+    if draw_overlay:
+        img = Image.alpha_composite(img, overlay)
+        img.save(output_dir + output_filename)
     return pt, output_filename
 
 
@@ -42,18 +45,20 @@ class OCR:
     def __init__(self, api_key):
         self.api_key = api_key
 
-    def space_file(self, filename, overlay=False, engine=2, lang='eng', file_type='Auto',
-                   detect_orientation=False, scale=True, detect_checkbox=False):
+    def space_file(self, filename, overlay=False, engine=2, lang=None, file_type='Auto',
+                   detect_orientation=True, scale=True, detect_checkbox=False):
         payload = {
             'isOverlayRequired': overlay,
             'apikey': self.api_key,
-            'language': lang,
             'FileType': file_type,
             'detectOrientation': detect_orientation,
             'scale': scale,
             'OCREngine': engine,
             'detectCheckbox': detect_checkbox,
         }
+
+        if lang is not None:
+            payload['language'] = lang
 
         with open(filename, 'rb') as f:
             response = requests.post(

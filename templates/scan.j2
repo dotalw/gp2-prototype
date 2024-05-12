@@ -1,10 +1,9 @@
 {% extends 'layout.j2' %}
 
 {% block content %}
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div class="grid grid-flow-row-dense grid-cols-2 md:grid-cols-3 gap-4">
         <div class="card w-96 bg-base-100 shadow-xl">
             <div class="card-body">
-                <p class="prose">{{ parsed_text }}</p>
                 <audio src="data:audio/mp3;base64,{{ tts_audio }}" controls autoplay></audio>
                 <div class="card-actions justify-center">
                     <a class="btn btn-wide btn-primary" href="{{ '/' }}">Back</a>
@@ -20,6 +19,9 @@
             <figure>
                 <img src="{{ url_for('static', filename='pictures/' + img) }}"/>
             </figure>
+        </div>
+        <div class="card w-full bg-base-100 shadow-xl col-span-3 prose">
+            {{ parsed_text }}
         </div>
     </div>
 {% endblock %}
